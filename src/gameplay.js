@@ -1,3 +1,12 @@
+var Directions = {
+  EAST : 0,
+  SOUTH : 1,
+  WEST : 2,
+  NORTH : 3,
+
+  COUNT : 4,
+};
+
 var Player = function (game, x, y) {
   Phaser.Sprite.call(this, game, x, y, 'test16x16', 3);
 
@@ -36,10 +45,49 @@ Player.prototype.update = function () {
   }
 };
 
+
+var EnemyGuard = function (game, x, y, player, foreground, isEvading, sightedPlayer) {
+  Phaser.Sprite.call(this, game, x, y, 'test16x16', 5);
+  this.anchor.set(0.5);
+
+  this.player = player;
+  this.foreground = foreground;
+
+  this.isEvading = isEvading;
+  this.sightedPlayer = sightedPlayer;
+
+  this.directionFacing = Directions.WEST;
+  this.sightRange = 5 * 16;
+  this.sightWidth = Math.PI / 2.5;
+};
+EnemyGuard.prototype = Object.create(Phaser.Sprite.prototype);
+EnemyGuard.prototype.constructor = EnemyGuard;
+EnemyGuard.prototype.update = function () {
+
+  if (this.isEvading() === false) {
+    if (this.position.distance(this.player.position, true) < this.sightRange) {
+      var guardAngleA = this.directionFacing / Directions.COUNT * Math.PI * 2 + (this.sightWidth / 2);
+      var guardAngleB = this.directionFacing / Directions.COUNT * Math.PI * 2 - (this.sightWidth / 2);
+      var playerAngle = (Math.PI * 2 + Math.atan2( this.player.y - this.position.y, this.player.x - this.position.x )) % (Math.PI * 2);
+
+      if (playerAngle > guardAngleB && playerAngle < guardAngleA) {
+
+        var rayCastResult = this.foreground.getRayCastTiles(new Phaser.Line(this.x, this.y, this.player.x, this.player.y), 4, true);
+
+        if (rayCastResult.length < 1) {
+          this.sightedPlayer();
+        }
+      }
+    }
+  }
+};
+
 var Gameplay = function () {
   this.player = null;
 
   this.isScrolling = false;
+
+  this.evading = false;
 
   this.map = null;
   this.foreground = null;
@@ -51,6 +99,18 @@ Gameplay.prototype.preload = function() {
   //
 };
 Gameplay.prototype.create = function() {
+  // closure context
+  var that = this;
+
+  // stealth game logic
+  this.evading = false;
+  this.isEvading = function () { return that.evading; };
+  this.sightedPlayer = function () {
+    that.evading = true;
+
+    console.log('sighted!');
+  };
+
   // create map
   this.map = this.game.add.tilemap('level1');
   this.map.addTilesetImage('sheet', 'test16x16_tile');
@@ -60,10 +120,13 @@ Gameplay.prototype.create = function() {
   // enable collision detections with map
   this.game.physics.enable(this.foreground, Phaser.Physics.ARCADE);
 
-  this.game.add.bitmapText(32, 32, 'font', 'lets scroll the map', 8);
+  this.game.add.bitmapText(32, 32, 'font', 'lets sneak past guards!', 8);
 
   this.player = new Player(this.game, 64, 64);
   this.game.add.existing(this.player);
+
+  this.randomGuard = new EnemyGuard(this.game, 256, 128, this.player, this.foreground, this.isEvading, this.sightedPlayer);
+  this.game.add.existing(this.randomGuard);
 
   // setup camera scrolling
   this.isScrolling = false;
@@ -93,11 +156,17 @@ Gameplay.prototype.update = function () {
         cameraShuffle.start();
     }
   }
-};/*
-Gameplay.prototype.render = function () {
-  this.game.debug.body(this.player);
 };
-*/
+Gameplay.prototype.render = function () {
+  var guardAngleA = this.randomGuard.directionFacing / Directions.COUNT * Math.PI * 2 + (this.randomGuard.sightWidth / 2);
+  var guardAngleB = this.randomGuard.directionFacing / Directions.COUNT * Math.PI * 2 - (this.randomGuard.sightWidth / 2);
+  var playerAngle = Math.atan2( this.player.y - this.randomGuard.position.y, this.player.x - this.randomGuard.position.x );
+
+  this.game.debug.geom(new Phaser.Circle(this.randomGuard.x, this.randomGuard.y, this.randomGuard.sightRange * 2), 'white', false);
+  this.game.debug.geom(new Phaser.Line(this.randomGuard.x, this.randomGuard.y, this.randomGuard.x + (Math.cos(guardAngleA) * this.randomGuard.sightRange), this.randomGuard.y + (Math.sin(guardAngleA) * this.randomGuard.sightRange)), 'white');
+  this.game.debug.geom(new Phaser.Line(this.randomGuard.x, this.randomGuard.y, this.randomGuard.x + (Math.cos(guardAngleB) * this.randomGuard.sightRange), this.randomGuard.y + (Math.sin(guardAngleB) * this.randomGuard.sightRange)), 'white');
+  this.game.debug.geom(new Phaser.Line(this.randomGuard.x, this.randomGuard.y, this.randomGuard.x + (Math.cos(playerAngle) * this.randomGuard.sightRange), this.randomGuard.y + (Math.sin(playerAngle) * this.randomGuard.sightRange)), 'blue');
+};
 Gameplay.prototype.shutdown = function () {
   this.player = null;
 
