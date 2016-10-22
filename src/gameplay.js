@@ -137,10 +137,20 @@ EnemyBullet.prototype.setDirection = function(direction) {
   this.body.velocity = new Phaser.Point(this.bulletSpeed * Math.cos(direction), this.bulletSpeed * Math.sin(direction));
 };
 
+var GoalObject = function (game, x, y) {
+  Phaser.Sprite.call(this, game, x + 8, y + 8, 'test16x16', 2);
+  this.game.physics.enable(this, Phaser.Physics.ARCADE);
+  this.body.setSize(16, 16);
+  this.anchor.set(0.5);
+};
+GoalObject.prototype = Object.create(Phaser.Sprite.prototype);
+GoalObject.prototype.constructor = GoalObject;
+
 var Gameplay = function () {
   this.player = null;
   this.guards = null;
   this.bulletPool = null;
+  this.goalObjectPool = null;
   this.ui = null;
 
   this.isScrolling = false;
@@ -184,6 +194,13 @@ Gameplay.prototype.create = function() {
   this.player = new Player(this.game, 64, 64);
   this.game.add.existing(this.player);
 
+  this.goalObjectPool = this.game.add.group();
+  for (var i = 0; i < 3; i++) {
+    var newGoal = new GoalObject(this.game, -1000, -1000);
+    this.goalObjectPool.addChild(newGoal);
+    this.goalObjectPool.addToHash(newGoal);
+    newGoal.kill();
+  }
 
   this.bulletPool = this.game.add.group();
   for (var i = 0; i < 20; i++) {
@@ -248,11 +265,30 @@ Gameplay.prototype.spawnGuardsForRoom = function () {
     }
   }, this);
 };
+Gameplay.prototype.spawnObjectsForRoom = function () {
+  // if there is a object in the bounds of the camera, spawn it in the room
+  this.map.objects.GameplayObjects.forEach(function (objectData) {
+    if (!(objectData.x > (this.camera.x + this.camera.width) ||
+          objectData.x < (this.camera.x) ||
+          objectData.y > (this.camera.y + this.camera.height) ||
+          objectData.y < (this.camera.y))) {
+      
+      if (objectData.name === "Goal") {
+        var newGoal = this.goalObjectPool.getFirstDead();
+        newGoal.revive();
+        newGoal.position.set(objectData.x, objectData.y);
+      }
+    }
+  }, this);
+};
 Gameplay.prototype.update = function () {
   this.game.physics.arcade.collide(this.player, this.foreground);
   this.game.physics.arcade.overlap(this.player, this.bulletPool, function (player, bullet) {
     player.kill();
     bullet.kill();
+  }, undefined, this);
+  this.game.physics.arcade.overlap(this.player, this.goalObjectPool, function (player, goal) {
+    goal.kill();
   }, undefined, this);
   this.game.physics.arcade.collide(this.foreground, this.bulletPool, function (bullet, foreground) {
     bullet.kill();
@@ -271,6 +307,9 @@ Gameplay.prototype.update = function () {
         this.guards.forEachAlive(function (guard) {
           guard.kill();
         }, this);
+        this.goalObjectPool.forEachAlive(function (goal) {
+          goal.kill();
+        }, this);
 
         var cameraShuffle = this.game.add.tween(this.camera);
         var targetX = (~~(this.player.x / this.camera.width)) * this.camera.width;
@@ -281,12 +320,14 @@ Gameplay.prototype.update = function () {
           this.player.disableMovement = false;
 
           this.spawnGuardsForRoom();
+          this.spawnObjectsForRoom();
 
         }, this);
         cameraShuffle.start();
     }
   }
 };
+/*
 Gameplay.prototype.render = function () {
   this.guards.forEachAlive(function (guard) {
     var guardAngleA = guard.directionFacing / Directions.COUNT * Math.PI * 2 + (guard.sightWidth / 2);
@@ -299,11 +340,12 @@ Gameplay.prototype.render = function () {
     this.game.debug.geom(new Phaser.Line(guard.x, guard.y, guard.x + (Math.cos(playerAngle) * guard.sightRange), guard.y + (Math.sin(playerAngle) * guard.sightRange)), 'blue');
   }, this);
   
-};
+};*/
 Gameplay.prototype.shutdown = function () {
   this.player = null;
   this.guards = [];
   this.bulletPool = null;
+  this.goalObjectPool = null;
   this.ui = null;
 
   this.map = null;
