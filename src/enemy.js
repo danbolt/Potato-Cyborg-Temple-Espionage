@@ -13,7 +13,10 @@ var EnemyGuard = function (game, x, y, player, foreground, isEvading, sightedPla
 
   this.patrolRoute = null;
   this.currentPatrolRouteIndex = 0;
-  this.events.onKilled.add(function () { this.patrolRoute = null; this.currentPatrolRouteIndex = 0; }, this);
+  this.events.onKilled.add(function () { this.patrolRoute = null; this.currentPatrolRouteIndex = 0; this.stopShooting(); }, this);
+
+  this.guardLoop = null;
+  this.fireRate = 500;
 
   this.directionFacing = Directions.WEST;
   this.sightRange = 5 * 16;
@@ -28,6 +31,11 @@ EnemyGuard.prototype.update = function () {
     return;
   }
 
+  if (this.shootFlag === true) {
+    this.shootFlag = false;
+
+    this.shootBullet();
+  }
 
   if (this.isEvading() === false) {
     // check if the player is in sight
@@ -62,6 +70,7 @@ EnemyGuard.prototype.update = function () {
 };
 EnemyGuard.prototype.shootBullet = function () {
   var newBullet = this.bulletPool.getFirstDead();
+  
   if (newBullet !== null) {
     var shootAngle = Math.atan2(this.player.y - this.y, this.player.x - this.x);
 
@@ -71,6 +80,16 @@ EnemyGuard.prototype.shootBullet = function () {
     newBullet.y = this.y;
 
     this.directionFacing =  ~~((((shootAngle + (Math.PI * 2)) % (Math.PI * 2) ) / (Math.PI * 2)) * Directions.COUNT);
+  }
+};
+EnemyGuard.prototype.startShooting = function () {
+  if (this.isEvading() && this.guardLoop === null) {
+    this.guardLoop = this.game.time.events.loop(this.fireRate, function () {  this.shootFlag = true; }, this);
+  }
+};
+EnemyGuard.prototype.stopShooting = function () {
+  if (this.guardLoop !== null) {
+    this.game.time.events.remove(this.guardLoop);
   }
 };
 

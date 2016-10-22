@@ -93,7 +93,7 @@ Gameplay.prototype.playerSighted = function () {
 
   this.guards.forEachAlive(function (g) {
     g.body.velocity.set(0, 0);
-    g.shootBullet();
+    g.startShooting();
   }, this);
 };
 Gameplay.prototype.playerSnuckAway = function () {
