@@ -48,6 +48,8 @@ Player.prototype.update = function () {
 
 var EnemyGuard = function (game, x, y, player, foreground, isEvading, sightedPlayer) {
   Phaser.Sprite.call(this, game, x, y, 'test16x16', 5);
+  this.game.physics.enable(this, Phaser.Physics.ARCADE);
+  this.body.setSize(16, 16);
   this.anchor.set(0.5);
 
   this.player = player;
@@ -56,9 +58,15 @@ var EnemyGuard = function (game, x, y, player, foreground, isEvading, sightedPla
   this.isEvading = isEvading;
   this.sightedPlayer = sightedPlayer;
 
+  this.patrolRoute = null;
+  this.currentPatrolRouteIndex = 0;
+  this.events.onKilled.add(function () { this.patrolRoute = null; this.currentPatrolRouteIndex = 0; }, this);
+
   this.directionFacing = Directions.WEST;
   this.sightRange = 5 * 16;
   this.sightWidth = Math.PI / 2.5;
+
+  this.walkSpeed = 100;
 };
 EnemyGuard.prototype = Object.create(Phaser.Sprite.prototype);
 EnemyGuard.prototype.constructor = EnemyGuard;
@@ -69,6 +77,7 @@ EnemyGuard.prototype.update = function () {
 
 
   if (this.isEvading() === false) {
+    // check if the player is in sight
     if (this.position.distance(this.player.position, true) < this.sightRange) {
       var guardAngleA = this.directionFacing / Directions.COUNT * Math.PI * 2 + (this.sightWidth / 2);
       var guardAngleB = this.directionFacing / Directions.COUNT * Math.PI * 2 - (this.sightWidth / 2);
@@ -80,8 +89,21 @@ EnemyGuard.prototype.update = function () {
 
         if (rayCastResult.length < 1) {
           this.sightedPlayer();
+          this.body.velocity.set(0, 0);
         }
       }
+    }
+
+    // follow our patrol route, if we have one
+    if (this.patrolRoute !== null && this.isEvading() === false) {
+      var currentPatrolNode = this.patrolRoute[this.currentPatrolRouteIndex];
+
+      if (this.position.distance(new Phaser.Point( currentPatrolNode.x, currentPatrolNode.y)) < 3) {
+        this.currentPatrolRouteIndex = (this.currentPatrolRouteIndex + 1) % this.patrolRoute.length;
+      }
+      var nextPatrolAngle = Math.atan2(currentPatrolNode.y - this.y, currentPatrolNode.x - this.x);
+      this.body.velocity = new Phaser.Point(this.walkSpeed * Math.cos(nextPatrolAngle), this.walkSpeed * Math.sin(nextPatrolAngle));
+      this.directionFacing =  ~~((((nextPatrolAngle + (Math.PI * 2)) % (Math.PI * 2) ) / (Math.PI * 2)) * Directions.COUNT);
     }
   }
 };
@@ -172,6 +194,15 @@ Gameplay.prototype.spawnGuardsForRoom = function () {
         newGuard.x = guardData.x + 8;
         newGuard.y = guardData.y + 8;
         newGuard.directionFacing = guardData.properties.direction;
+        if (guardData.properties.patrol) {
+          var patrolData = JSON.parse(guardData.properties.patrol);
+          newGuard.patrolRoute = [];
+          patrolData.forEach(function (patrolNode) {
+            //newGuard.patrolRoute.push();
+            var matchingNode = this.map.objects.PatrolNodes.find(function (node) { return (node.name === patrolNode); }, this);
+            newGuard.patrolRoute.push(matchingNode);
+          }, this);
+        }
       }
     }
   }, this);
