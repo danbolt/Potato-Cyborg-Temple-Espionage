@@ -147,9 +147,13 @@ Gameplay.prototype.update = function () {
   this.game.physics.arcade.overlap(this.player, this.bulletPool, function (player, bullet) {
     player.kill();
     bullet.kill();
+
+    this.game.state.start('LoseScreen');
   }, undefined, this);
   this.game.physics.arcade.overlap(this.player, this.goalObjectPool, function (player, goal) {
     goal.kill();
+
+    this.game.state.start('WinScreen');
   }, undefined, this);
   this.game.physics.arcade.collide(this.foreground, this.bulletPool, function (bullet, foreground) {
     bullet.kill();
