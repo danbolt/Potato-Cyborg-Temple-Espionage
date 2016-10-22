@@ -84,6 +84,7 @@ EnemyGuard.prototype.update = function () {
 
 var Gameplay = function () {
   this.player = null;
+  this.guards = [];
 
   this.isScrolling = false;
 
@@ -125,8 +126,14 @@ Gameplay.prototype.create = function() {
   this.player = new Player(this.game, 64, 64);
   this.game.add.existing(this.player);
 
-  this.randomGuard = new EnemyGuard(this.game, 256, 128, this.player, this.foreground, this.isEvading, this.sightedPlayer);
-  this.game.add.existing(this.randomGuard);
+  // add some dummy guards
+  var newGuard = new EnemyGuard(this.game, 256, 128, this.player, this.foreground, this.isEvading, this.sightedPlayer);
+  this.game.add.existing(newGuard);
+  this.guards.push(newGuard);
+  newGuard = new EnemyGuard(this.game, 246, 32, this.player, this.foreground, this.isEvading, this.sightedPlayer);
+  newGuard.directionFacing = Directions.EAST;
+  this.game.add.existing(newGuard);
+  this.guards.push(newGuard);
 
   // setup camera scrolling
   this.isScrolling = false;
@@ -145,6 +152,8 @@ Gameplay.prototype.update = function () {
         this.isScrolling = true;
         this.player.disableMovement = true;
 
+        this.evading = false;
+
         var cameraShuffle = this.game.add.tween(this.camera);
         var targetX = (~~(this.player.x / this.camera.width)) * this.camera.width;
         var targetY = (~~(this.player.y / this.camera.height)) * this.camera.height;
@@ -158,17 +167,21 @@ Gameplay.prototype.update = function () {
   }
 };
 Gameplay.prototype.render = function () {
-  var guardAngleA = this.randomGuard.directionFacing / Directions.COUNT * Math.PI * 2 + (this.randomGuard.sightWidth / 2);
-  var guardAngleB = this.randomGuard.directionFacing / Directions.COUNT * Math.PI * 2 - (this.randomGuard.sightWidth / 2);
-  var playerAngle = Math.atan2( this.player.y - this.randomGuard.position.y, this.player.x - this.randomGuard.position.x );
+  this.guards.forEach(function (guard) {
+    var guardAngleA = guard.directionFacing / Directions.COUNT * Math.PI * 2 + (guard.sightWidth / 2);
+    var guardAngleB = guard.directionFacing / Directions.COUNT * Math.PI * 2 - (guard.sightWidth / 2);
+    var playerAngle = Math.atan2( this.player.y - guard.position.y, this.player.x - guard.position.x );
 
-  this.game.debug.geom(new Phaser.Circle(this.randomGuard.x, this.randomGuard.y, this.randomGuard.sightRange * 2), 'white', false);
-  this.game.debug.geom(new Phaser.Line(this.randomGuard.x, this.randomGuard.y, this.randomGuard.x + (Math.cos(guardAngleA) * this.randomGuard.sightRange), this.randomGuard.y + (Math.sin(guardAngleA) * this.randomGuard.sightRange)), 'white');
-  this.game.debug.geom(new Phaser.Line(this.randomGuard.x, this.randomGuard.y, this.randomGuard.x + (Math.cos(guardAngleB) * this.randomGuard.sightRange), this.randomGuard.y + (Math.sin(guardAngleB) * this.randomGuard.sightRange)), 'white');
-  this.game.debug.geom(new Phaser.Line(this.randomGuard.x, this.randomGuard.y, this.randomGuard.x + (Math.cos(playerAngle) * this.randomGuard.sightRange), this.randomGuard.y + (Math.sin(playerAngle) * this.randomGuard.sightRange)), 'blue');
+    this.game.debug.geom(new Phaser.Circle(guard.x, guard.y, guard.sightRange * 2), 'white', false);
+    this.game.debug.geom(new Phaser.Line(guard.x, guard.y, guard.x + (Math.cos(guardAngleA) * guard.sightRange), guard.y + (Math.sin(guardAngleA) * guard.sightRange)), 'white');
+    this.game.debug.geom(new Phaser.Line(guard.x, guard.y, guard.x + (Math.cos(guardAngleB) * guard.sightRange), guard.y + (Math.sin(guardAngleB) * guard.sightRange)), 'white');
+    this.game.debug.geom(new Phaser.Line(guard.x, guard.y, guard.x + (Math.cos(playerAngle) * guard.sightRange), guard.y + (Math.sin(playerAngle) * guard.sightRange)), 'blue');
+  }, this);
+  
 };
 Gameplay.prototype.shutdown = function () {
   this.player = null;
+  this.guards = [];
 
   this.map = null;
   this.foreground = null;
