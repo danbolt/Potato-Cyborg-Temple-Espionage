@@ -29,6 +29,9 @@ Player.prototype.update = function () {
 
 var Gameplay = function () {
   this.player = null;
+
+  this.map = null;
+  this.foreground = null;
 };
 Gameplay.prototype.init = function() {
   //
@@ -37,11 +40,30 @@ Gameplay.prototype.preload = function() {
   //
 };
 Gameplay.prototype.create = function() {
-  this.game.add.bitmapText(32, 32, 'font', 'lets make a player', 8);
+  // create map
+  this.map = this.game.add.tilemap('level1');
+  this.map.addTilesetImage('sheet', 'test16x16_tile');
+  this.map.setCollisionByExclusion([0]);
+  this.foreground = this.map.createLayer('Foreground');
 
-  this.player = new Player(this.game, 0, 64);
+  // enable collision detections with map
+  this.game.physics.enable(this.foreground, Phaser.Physics.ARCADE);
+
+  this.game.add.bitmapText(32, 32, 'font', 'lets scroll the map', 8);
+
+  this.player = new Player(this.game, 64, 64);
   this.game.add.existing(this.player);
 };
+Gameplay.prototype.update = function () {
+  this.game.physics.arcade.collide(this.player, this.foreground);
+};/*
+Gameplay.prototype.render = function () {
+  this.game.debug.body(this.player);
+};
+*/
 Gameplay.prototype.shutdown = function () {
   this.player = null;
+
+  this.map = null;
+  this.foreground = null;
 };
