@@ -45,8 +45,7 @@ Player.prototype.update = function () {
   }
 };
 
-
-var EnemyGuard = function (game, x, y, player, foreground, isEvading, sightedPlayer) {
+var EnemyGuard = function (game, x, y, player, foreground, isEvading, sightedPlayer, bulletPool) {
   Phaser.Sprite.call(this, game, x, y, 'test16x16', 5);
   this.game.physics.enable(this, Phaser.Physics.ARCADE);
   this.body.setSize(16, 16);
@@ -54,6 +53,7 @@ var EnemyGuard = function (game, x, y, player, foreground, isEvading, sightedPla
 
   this.player = player;
   this.foreground = foreground;
+  this.bulletPool = bulletPool;
 
   this.isEvading = isEvading;
   this.sightedPlayer = sightedPlayer;
@@ -107,10 +107,36 @@ EnemyGuard.prototype.update = function () {
     }
   }
 };
+EnemyGuard.prototype.shootBullet = function () {
+  var newBullet = this.bulletPool.getFirstDead();
+  if (newBullet !== null) {
+    newBullet.revive();
+    newBullet.setDirection(Math.atan2(this.player.y - this.y, this.player.x - this.x));
+    newBullet.x = this.x;
+    newBullet.y = this.y;
+  }
+};
+
+var EnemyBullet = function (game, x, y, direction, foreground) {
+  Phaser.Sprite.call(this, game, x, y, 'test16x16', 6);
+  this.game.physics.enable(this, Phaser.Physics.ARCADE);
+  this.body.setSize(8, 8);
+  this.anchor.set(0.5);
+
+  this.bulletSpeed = 200;
+
+  this.setDirection(direction);
+};
+EnemyBullet.prototype = Object.create(Phaser.Sprite.prototype);
+EnemyBullet.prototype.constructor = EnemyBullet;
+EnemyBullet.prototype.setDirection = function(direction) {
+  this.body.velocity = new Phaser.Point(this.bulletSpeed * Math.cos(direction), this.bulletSpeed * Math.sin(direction));
+};
 
 var Gameplay = function () {
   this.player = null;
   this.guards = null;
+  this.bulletPool = null;
   this.ui = null;
 
   this.isScrolling = false;
@@ -154,11 +180,18 @@ Gameplay.prototype.create = function() {
   this.player = new Player(this.game, 64, 64);
   this.game.add.existing(this.player);
 
-  this.guards = this.game.add.group();
 
-  // add some dummy guards
+  this.bulletPool = this.game.add.group();
+  for (var i = 0; i < 20; i++) {
+    var newBullet = new EnemyBullet(this.game, -1000, -1000, 0, this.foreground);
+    this.bulletPool.addChild(newBullet);
+    this.bulletPool.addToHash(newBullet);
+    newBullet.kill();
+  }
+
+  this.guards = this.game.add.group();
   for (var i = 0; i < 10; i++) {
-    var newGuard = new EnemyGuard(this.game, -999, -999, this.player, this.foreground, this.isEvading, this.sightedPlayer);
+    var newGuard = new EnemyGuard(this.game, -999, -999, this.player, this.foreground, this.isEvading, this.sightedPlayer, this.bulletPool);
     this.game.add.existing(newGuard);
     this.guards.addChild(newGuard);
     newGuard.kill();
@@ -175,6 +208,11 @@ Gameplay.prototype.create = function() {
 Gameplay.prototype.playerSighted = function () {
   this.evading = true;
   this.ui.sneakLabel.text = 'watch out!';
+
+  this.guards.forEachAlive(function (g) {
+    g.body.velocity.set(0, 0);
+    g.shootBullet();
+  }, this);
 };
 Gameplay.prototype.playerSnuckAway = function () {
   this.evading = false;
@@ -198,7 +236,6 @@ Gameplay.prototype.spawnGuardsForRoom = function () {
           var patrolData = JSON.parse(guardData.properties.patrol);
           newGuard.patrolRoute = [];
           patrolData.forEach(function (patrolNode) {
-            //newGuard.patrolRoute.push();
             var matchingNode = this.map.objects.PatrolNodes.find(function (node) { return (node.name === patrolNode); }, this);
             newGuard.patrolRoute.push(matchingNode);
           }, this);
@@ -209,6 +246,13 @@ Gameplay.prototype.spawnGuardsForRoom = function () {
 };
 Gameplay.prototype.update = function () {
   this.game.physics.arcade.collide(this.player, this.foreground);
+  this.game.physics.arcade.overlap(this.player, this.bulletPool, function (player, bullet) {
+    player.kill();
+    bullet.kill();
+  }, undefined, this);
+  this.game.physics.arcade.collide(this.foreground, this.bulletPool, function (bullet, foreground) {
+    bullet.kill();
+  }, undefined, this);
 
   if (this.isScrolling === false) {
     if (this.player.x > (this.camera.x + this.camera.width) ||
@@ -234,18 +278,6 @@ Gameplay.prototype.update = function () {
 
           this.spawnGuardsForRoom();
 
-          // randomly put some guards in the room
-          /*
-          for (var i = 0; i < 3; i++) {
-            var newGuard = this.guards.getFirstDead();
-            if (newGuard !== null) {
-              newGuard.revive();
-              newGuard.directionFacing = ~~(Directions.COUNT * Math.random());
-              newGuard.x = this.camera.x + (this.camera.width / 4) + (this.camera.width / 2 * Math.random());
-              newGuard.y = this.camera.y + (this.camera.height / 4) + (this.camera.height / 2 * Math.random());
-            }
-          } */
-
         }, this);
         cameraShuffle.start();
     }
@@ -267,6 +299,7 @@ Gameplay.prototype.render = function () {
 Gameplay.prototype.shutdown = function () {
   this.player = null;
   this.guards = [];
+  this.bulletPool = null;
   this.ui = null;
 
   this.map = null;
