@@ -63,6 +63,10 @@ var EnemyGuard = function (game, x, y, player, foreground, isEvading, sightedPla
 EnemyGuard.prototype = Object.create(Phaser.Sprite.prototype);
 EnemyGuard.prototype.constructor = EnemyGuard;
 EnemyGuard.prototype.update = function () {
+  if (this.alive === false) {
+    return;
+  }
+
 
   if (this.isEvading() === false) {
     if (this.position.distance(this.player.position, true) < this.sightRange) {
@@ -85,6 +89,7 @@ EnemyGuard.prototype.update = function () {
 var Gameplay = function () {
   this.player = null;
   this.guards = null;
+  this.ui = null;
 
   this.isScrolling = false;
 
@@ -107,9 +112,7 @@ Gameplay.prototype.create = function() {
   this.evading = false;
   this.isEvading = function () { return that.evading; };
   this.sightedPlayer = function () {
-    that.evading = true;
-
-    console.log('sighted!');
+    that.playerSighted();
   };
 
   // create map
@@ -121,7 +124,10 @@ Gameplay.prototype.create = function() {
   // enable collision detections with map
   this.game.physics.enable(this.foreground, Phaser.Physics.ARCADE);
 
-  this.game.add.bitmapText(32, 32, 'font', 'lets sneak past guards!', 8);
+  this.ui = this.game.add.group();
+  this.ui.sneakLabel = this.ui.addChild(this.game.add.bitmapText(32, 32, 'font', 'test', 8));
+  this.ui.fixedToCamera = true;
+  this.playerSnuckAway();
 
   this.player = new Player(this.game, 64, 64);
   this.game.add.existing(this.player);
@@ -140,6 +146,16 @@ Gameplay.prototype.create = function() {
   this.isScrolling = false;
   this.camera.roundPx = true;
   this.camera.bounds = null;
+
+  this.game.world.bringToTop(this.ui);
+};
+Gameplay.prototype.playerSighted = function () {
+  this.evading = true;
+  this.ui.sneakLabel.text = 'watch out!';
+};
+Gameplay.prototype.playerSnuckAway = function () {
+  this.evading = false;
+  this.ui.sneakLabel.text = 'sneaking!';
 };
 Gameplay.prototype.update = function () {
   this.game.physics.arcade.collide(this.player, this.foreground);
@@ -153,7 +169,7 @@ Gameplay.prototype.update = function () {
         this.isScrolling = true;
         this.player.disableMovement = true;
 
-        this.evading = false;
+        this.playerSnuckAway();
         this.guards.forEachAlive(function (guard) {
           guard.kill();
         }, this);
@@ -197,6 +213,7 @@ Gameplay.prototype.render = function () {
 Gameplay.prototype.shutdown = function () {
   this.player = null;
   this.guards = [];
+  this.ui = null;
 
   this.map = null;
   this.foreground = null;
