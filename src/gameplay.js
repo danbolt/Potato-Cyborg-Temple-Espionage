@@ -136,11 +136,12 @@ Gameplay.prototype.create = function() {
 
   // add some dummy guards
   for (var i = 0; i < 10; i++) {
-    var newGuard = new EnemyGuard(this.game, 256, 128, this.player, this.foreground, this.isEvading, this.sightedPlayer);
+    var newGuard = new EnemyGuard(this.game, -999, -999, this.player, this.foreground, this.isEvading, this.sightedPlayer);
     this.game.add.existing(newGuard);
     this.guards.addChild(newGuard);
     newGuard.kill();
   }
+  this.spawnGuardsForRoom();
 
   // setup camera scrolling
   this.isScrolling = false;
@@ -156,6 +157,24 @@ Gameplay.prototype.playerSighted = function () {
 Gameplay.prototype.playerSnuckAway = function () {
   this.evading = false;
   this.ui.sneakLabel.text = 'sneaking!';
+};
+Gameplay.prototype.spawnGuardsForRoom = function () {
+  // if there is a guard in the bounds of the camera, spawn it in the room
+  this.map.objects.Guards.forEach(function (guardData) {
+    if (!(guardData.x > (this.camera.x + this.camera.width) ||
+          guardData.x < (this.camera.x) ||
+          guardData.y > (this.camera.y + this.camera.height) ||
+          guardData.y < (this.camera.y))) {
+      var newGuard = this.guards.getFirstDead();
+      if (newGuard !== null) {
+        newGuard.revive();
+
+        newGuard.x = guardData.x + 8;
+        newGuard.y = guardData.y + 8;
+        newGuard.directionFacing = guardData.properties.direction;
+      }
+    }
+  }, this);
 };
 Gameplay.prototype.update = function () {
   this.game.physics.arcade.collide(this.player, this.foreground);
@@ -182,6 +201,10 @@ Gameplay.prototype.update = function () {
           this.isScrolling = false;
           this.player.disableMovement = false;
 
+          this.spawnGuardsForRoom();
+
+          // randomly put some guards in the room
+          /*
           for (var i = 0; i < 3; i++) {
             var newGuard = this.guards.getFirstDead();
             if (newGuard !== null) {
@@ -190,7 +213,7 @@ Gameplay.prototype.update = function () {
               newGuard.x = this.camera.x + (this.camera.width / 4) + (this.camera.width / 2 * Math.random());
               newGuard.y = this.camera.y + (this.camera.height / 4) + (this.camera.height / 2 * Math.random());
             }
-          }
+          } */
 
         }, this);
         cameraShuffle.start();

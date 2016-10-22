@@ -10,8 +10,77 @@
          "width":50,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "height":30,
+         "name":"Guards",
+         "objects":[
+                {
+                 "height":16,
+                 "id":1,
+                 "name":"FirstGuard",
+                 "properties":
+                    {
+                     "direction":"1"
+                    },
+                 "propertytypes":
+                    {
+                     "direction":"string"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":64,
+                 "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":4,
+                 "name":"AnotherGuard",
+                 "properties":
+                    {
+                     "direction":"2"
+                    },
+                 "propertytypes":
+                    {
+                     "direction":"string"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":176,
+                 "y":32
+                }, 
+                {
+                 "height":16,
+                 "id":5,
+                 "name":"AnotherGuard",
+                 "properties":
+                    {
+                     "direction":"3"
+                    },
+                 "propertytypes":
+                    {
+                     "direction":"string"
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":128,
+                 "y":256
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "width":50,
+         "x":0,
+         "y":0
         }],
- "nextobjectid":1,
+ "nextobjectid":6,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tileheight":16,
