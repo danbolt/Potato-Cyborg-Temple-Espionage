@@ -110,10 +110,14 @@ EnemyGuard.prototype.update = function () {
 EnemyGuard.prototype.shootBullet = function () {
   var newBullet = this.bulletPool.getFirstDead();
   if (newBullet !== null) {
+    var shootAngle = Math.atan2(this.player.y - this.y, this.player.x - this.x);
+
     newBullet.revive();
-    newBullet.setDirection(Math.atan2(this.player.y - this.y, this.player.x - this.x));
+    newBullet.setDirection(shootAngle);
     newBullet.x = this.x;
     newBullet.y = this.y;
+
+    this.directionFacing =  ~~((((shootAngle + (Math.PI * 2)) % (Math.PI * 2) ) / (Math.PI * 2)) * Directions.COUNT);
   }
 };
 
