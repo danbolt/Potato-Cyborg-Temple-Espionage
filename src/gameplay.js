@@ -84,7 +84,7 @@ EnemyGuard.prototype.update = function () {
 
 var Gameplay = function () {
   this.player = null;
-  this.guards = [];
+  this.guards = null;
 
   this.isScrolling = false;
 
@@ -126,14 +126,15 @@ Gameplay.prototype.create = function() {
   this.player = new Player(this.game, 64, 64);
   this.game.add.existing(this.player);
 
+  this.guards = this.game.add.group();
+
   // add some dummy guards
-  var newGuard = new EnemyGuard(this.game, 256, 128, this.player, this.foreground, this.isEvading, this.sightedPlayer);
-  this.game.add.existing(newGuard);
-  this.guards.push(newGuard);
-  newGuard = new EnemyGuard(this.game, 246, 32, this.player, this.foreground, this.isEvading, this.sightedPlayer);
-  newGuard.directionFacing = Directions.EAST;
-  this.game.add.existing(newGuard);
-  this.guards.push(newGuard);
+  for (var i = 0; i < 10; i++) {
+    var newGuard = new EnemyGuard(this.game, 256, 128, this.player, this.foreground, this.isEvading, this.sightedPlayer);
+    this.game.add.existing(newGuard);
+    this.guards.addChild(newGuard);
+    newGuard.kill();
+  }
 
   // setup camera scrolling
   this.isScrolling = false;
@@ -153,6 +154,9 @@ Gameplay.prototype.update = function () {
         this.player.disableMovement = true;
 
         this.evading = false;
+        this.guards.forEachAlive(function (guard) {
+          guard.kill();
+        }, this);
 
         var cameraShuffle = this.game.add.tween(this.camera);
         var targetX = (~~(this.player.x / this.camera.width)) * this.camera.width;
@@ -161,20 +165,31 @@ Gameplay.prototype.update = function () {
         cameraShuffle.onComplete.add(function () {
           this.isScrolling = false;
           this.player.disableMovement = false;
+
+          for (var i = 0; i < 3; i++) {
+            var newGuard = this.guards.getFirstDead();
+            if (newGuard !== null) {
+              newGuard.revive();
+              newGuard.directionFacing = ~~(Directions.COUNT * Math.random());
+              newGuard.x = this.camera.x + (this.camera.width / 4) + (this.camera.width / 2 * Math.random());
+              newGuard.y = this.camera.y + (this.camera.height / 4) + (this.camera.height / 2 * Math.random());
+            }
+          }
+
         }, this);
         cameraShuffle.start();
     }
   }
 };
 Gameplay.prototype.render = function () {
-  this.guards.forEach(function (guard) {
+  this.guards.forEachAlive(function (guard) {
     var guardAngleA = guard.directionFacing / Directions.COUNT * Math.PI * 2 + (guard.sightWidth / 2);
     var guardAngleB = guard.directionFacing / Directions.COUNT * Math.PI * 2 - (guard.sightWidth / 2);
     var playerAngle = Math.atan2( this.player.y - guard.position.y, this.player.x - guard.position.x );
 
     this.game.debug.geom(new Phaser.Circle(guard.x, guard.y, guard.sightRange * 2), 'white', false);
-    this.game.debug.geom(new Phaser.Line(guard.x, guard.y, guard.x + (Math.cos(guardAngleA) * guard.sightRange), guard.y + (Math.sin(guardAngleA) * guard.sightRange)), 'white');
-    this.game.debug.geom(new Phaser.Line(guard.x, guard.y, guard.x + (Math.cos(guardAngleB) * guard.sightRange), guard.y + (Math.sin(guardAngleB) * guard.sightRange)), 'white');
+    this.game.debug.geom(new Phaser.Line(guard.x, guard.y, guard.x + (Math.cos(guardAngleA) * guard.sightRange), guard.y + (Math.sin(guardAngleA) * guard.sightRange)), 'red');
+    this.game.debug.geom(new Phaser.Line(guard.x, guard.y, guard.x + (Math.cos(guardAngleB) * guard.sightRange), guard.y + (Math.sin(guardAngleB) * guard.sightRange)), 'red');
     this.game.debug.geom(new Phaser.Line(guard.x, guard.y, guard.x + (Math.cos(playerAngle) * guard.sightRange), guard.y + (Math.sin(playerAngle) * guard.sightRange)), 'blue');
   }, this);
   
