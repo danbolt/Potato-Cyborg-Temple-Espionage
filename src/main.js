@@ -28,13 +28,15 @@ Preload.prototype.preload = function() {
   this.game.load.bitmapFont('font', 'asset/font/font.png', 'asset/font/font.json');
 };
 Preload.prototype.create = function() {
- 	this.game.add.bitmapText(32, 32, 'font', 'hello, world!', 8);
+ 	this.game.state.start('Load');
 };
 
 var main = function () {
 	console.log('hello, jam! 😊');
 
 	var game = new Phaser.Game(320, 240);
+	game.state.add('Gameplay', Gameplay, false);
+	game.state.add('Load', Load, false);
 	game.state.add('Preload', Preload, false);
 
 	game.state.start('Preload');
