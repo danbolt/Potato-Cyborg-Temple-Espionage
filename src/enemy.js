@@ -121,7 +121,7 @@ EnemyGuard.prototype.stopShooting = function () {
 };
 
 var EnemyBullet = function (game, x, y, direction, foreground) {
-  Phaser.Sprite.call(this, game, x, y, 'test16x16', 6);
+  Phaser.Sprite.call(this, game, x, y, 'sprite_sheet_16x16', 80);
   this.game.physics.enable(this, Phaser.Physics.ARCADE);
   this.body.setSize(8, 8);
   this.anchor.set(0.5);
@@ -129,6 +129,9 @@ var EnemyBullet = function (game, x, y, direction, foreground) {
   this.bulletSpeed = 200;
 
   this.setDirection(direction);
+
+  this.animations.add('spin', [80, 81, 82, 83], 16, true);
+  this.animations.play('spin');
 };
 EnemyBullet.prototype = Object.create(Phaser.Sprite.prototype);
 EnemyBullet.prototype.constructor = EnemyBullet;

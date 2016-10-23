@@ -54,7 +54,7 @@ Gameplay.prototype.create = function() {
   this.ui.fixedToCamera = true;
   this.playerSnuckAway();
 
-  this.player = new Player(this.game, 64, 64);
+  this.player = new Player(this.game, 30 * 16, 144 * 16);
   this.game.add.existing(this.player);
 
   this.goalObjectPool = this.game.add.group();
@@ -86,6 +86,8 @@ Gameplay.prototype.create = function() {
   this.isScrolling = false;
   this.camera.roundPx = true;
   this.camera.bounds = null;
+  this.camera.x = 20 * 16;
+  this.camera.y = 135 * 16;
 
   this.game.world.bringToTop(this.ui);
 };
