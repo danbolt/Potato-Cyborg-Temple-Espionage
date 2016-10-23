@@ -75,7 +75,18 @@ EnemyGuard.prototype.update = function () {
       }
       var nextPatrolAngle = Math.atan2(currentPatrolNode.y - this.y, currentPatrolNode.x - this.x);
       this.body.velocity = new Phaser.Point(this.walkSpeed * Math.cos(nextPatrolAngle), this.walkSpeed * Math.sin(nextPatrolAngle));
-      this.directionFacing =  ~~((((nextPatrolAngle + (Math.PI * 2)) % (Math.PI * 2) ) / (Math.PI * 2)) * Directions.COUNT);
+
+      // really gross trig(!)
+      nextPatrolAngle = (nextPatrolAngle + Math.PI * 2) % (Math.PI * 2);
+      if (nextPatrolAngle < Math.PI / 4 || nextPatrolAngle > (Math.PI * 2 - (Math.PI / 4))) {
+        this.directionFacing = Directions.EAST;
+      } else if (nextPatrolAngle > Math.PI / 4 && nextPatrolAngle < Math.PI - (Math.PI / 4)) {
+        this.directionFacing = Directions.SOUTH;
+      } else if (nextPatrolAngle > Math.PI - (Math.PI / 4) && nextPatrolAngle < Math.PI + (Math.PI / 4)) {
+        this.directionFacing = Directions.WEST;
+      } else {
+        this.directionFacing = Directions.NORTH;
+      }
     }
   }
 
@@ -126,7 +137,7 @@ var EnemyBullet = function (game, x, y, direction, foreground) {
   this.body.setSize(8, 8);
   this.anchor.set(0.5);
 
-  this.bulletSpeed = 200;
+  this.bulletSpeed = 360;
 
   this.setDirection(direction);
 

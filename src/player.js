@@ -21,7 +21,7 @@ var Player = function (game, x, y) {
 
   this.game.physics.enable(this, Phaser.Physics.ARCADE);
   this.body.setSize(16, 16);
-  this.anchor.set(0.5);
+  this.anchor.set(0.5, 0.75);
   this.body.offset.y = 16;
 };
 Player.prototype = Object.create(Phaser.Sprite.prototype);

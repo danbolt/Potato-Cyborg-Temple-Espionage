@@ -231,6 +231,7 @@ Gameplay.prototype.render = function () {
     this.game.debug.geom(new Phaser.Line(guard.x, guard.y, guard.x + (Math.cos(playerAngle) * guard.sightRange), guard.y + (Math.sin(playerAngle) * guard.sightRange)), 'blue');
   }, this);
   
+  this.game.debug.body(this.player);
 };
 */
 Gameplay.prototype.shutdown = function () {
