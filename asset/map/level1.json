@@ -131,6 +131,14 @@
                  "height":16,
                  "id":12,
                  "name":"Goal",
+                 "properties":
+                    {
+                     "index":1
+                    },
+                 "propertytypes":
+                    {
+                     "index":"int"
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -142,6 +150,14 @@
                  "height":16,
                  "id":13,
                  "name":"Goal",
+                 "properties":
+                    {
+                     "index":0
+                    },
+                 "propertytypes":
+                    {
+                     "index":"int"
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -153,6 +169,14 @@
                  "height":16,
                  "id":14,
                  "name":"Goal",
+                 "properties":
+                    {
+                     "index":2
+                    },
+                 "propertytypes":
+                    {
+                     "index":"int"
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,

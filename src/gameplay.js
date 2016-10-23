@@ -1,5 +1,5 @@
-var GoalObject = function (game, x, y) {
-  Phaser.Sprite.call(this, game, x + 8, y + 8, 'test16x16', 2);
+var GoalObject = function (game, x, y, index) {
+  Phaser.Sprite.call(this, game, x + 8, y + 8, 'sprite_sheet_16x16', 0);
   this.game.physics.enable(this, Phaser.Physics.ARCADE);
   this.body.setSize(16, 16);
   this.anchor.set(0.5);
@@ -56,6 +56,8 @@ Gameplay.prototype.create = function() {
 
   this.player = new Player(this.game, 30 * 16, 144 * 16);
   this.game.add.existing(this.player);
+
+  player = this.player;
 
   this.goalObjectPool = this.game.add.group();
   for (var i = 0; i < 3; i++) {
@@ -142,6 +144,7 @@ Gameplay.prototype.spawnObjectsForRoom = function () {
         var newGoal = this.goalObjectPool.getFirstDead();
         newGoal.revive();
         newGoal.position.set(objectData.x, objectData.y);
+        newGoal.frame = 86 + objectData.properties.index;
       }
     }
   }, this);
