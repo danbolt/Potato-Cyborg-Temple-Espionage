@@ -20,6 +20,7 @@ var Gameplay = function () {
 
   this.map = null;
   this.foreground = null;
+  this.background = null;
 };
 Gameplay.prototype.init = function() {
   //
@@ -41,8 +42,9 @@ Gameplay.prototype.create = function() {
   // create map
   this.map = this.game.add.tilemap('level1');
   this.map.addTilesetImage('sheet', 'test16x16_tile');
-  this.map.setCollisionByExclusion([0]);
+  this.background = this.map.createLayer('Background');
   this.foreground = this.map.createLayer('Foreground');
+  this.map.setCollisionByExclusion([0], true, this.foreground);
 
   // enable collision detections with map
   this.game.physics.enable(this.foreground, Phaser.Physics.ARCADE);
@@ -144,6 +146,7 @@ Gameplay.prototype.spawnObjectsForRoom = function () {
 };
 Gameplay.prototype.update = function () {
   this.game.physics.arcade.collide(this.player, this.foreground);
+
   this.game.physics.arcade.overlap(this.player, this.bulletPool, function (player, bullet) {
     player.kill();
     bullet.kill();
@@ -192,7 +195,7 @@ Gameplay.prototype.update = function () {
     }
   }
 };
-/*
+
 Gameplay.prototype.render = function () {
   this.guards.forEachAlive(function (guard) {
     var guardAngleA = guard.directionFacing / Directions.COUNT * Math.PI * 2 + (guard.sightWidth / 2);
@@ -205,7 +208,7 @@ Gameplay.prototype.render = function () {
     this.game.debug.geom(new Phaser.Line(guard.x, guard.y, guard.x + (Math.cos(playerAngle) * guard.sightRange), guard.y + (Math.sin(playerAngle) * guard.sightRange)), 'blue');
   }, this);
   
-};*/
+};
 Gameplay.prototype.shutdown = function () {
   this.player = null;
   this.guards = [];
@@ -215,4 +218,5 @@ Gameplay.prototype.shutdown = function () {
 
   this.map = null;
   this.foreground = null;
+  this.background = null;
 };

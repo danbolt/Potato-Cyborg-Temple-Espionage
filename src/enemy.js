@@ -1,8 +1,8 @@
 var EnemyGuard = function (game, x, y, player, foreground, isEvading, sightedPlayer, bulletPool) {
-  Phaser.Sprite.call(this, game, x, y, 'test16x16', 5);
+  Phaser.Sprite.call(this, game, x, y, 'sprite_sheet_32x32', 5);
   this.game.physics.enable(this, Phaser.Physics.ARCADE);
   this.body.setSize(16, 16);
-  this.anchor.set(0.5);
+  this.anchor.set(0.5, 1);
 
   this.player = player;
   this.foreground = foreground;
@@ -19,10 +19,20 @@ var EnemyGuard = function (game, x, y, player, foreground, isEvading, sightedPla
   this.fireRate = 500;
 
   this.directionFacing = Directions.WEST;
-  this.sightRange = 5 * 16;
+  this.sightRange = 10 * 16;
   this.sightWidth = Math.PI / 2.5;
 
   this.walkSpeed = 100;
+
+  // animations
+  this.animations.add('walk_down_patrol', [4, 5], 4, true);
+  this.animations.add('walk_up_patrol', [6, 7], 4, true);
+  this.animations.add('walk_left_patrol', [10, 11], 4, true);
+  this.animations.add('walk_right_patrol', [8, 9], 4, true);
+  this.animations.add('walk_down_angry', [4, 5].map(function (i) { return i+8; }), 4, true);
+  this.animations.add('walk_up_angry', [6, 7].map(function (i) { return i+8; }), 4, true);
+  this.animations.add('walk_left_angry', [10, 11].map(function (i) { return i+8; }), 4, true);
+  this.animations.add('walk_right_angry', [8, 9].map(function (i) { return i+8; }), 4, true);
 };
 EnemyGuard.prototype = Object.create(Phaser.Sprite.prototype);
 EnemyGuard.prototype.constructor = EnemyGuard;
@@ -67,7 +77,23 @@ EnemyGuard.prototype.update = function () {
       this.directionFacing =  ~~((((nextPatrolAngle + (Math.PI * 2)) % (Math.PI * 2) ) / (Math.PI * 2)) * Directions.COUNT);
     }
   }
+
+  this.animations.play('walk_' + this.directionToString(this.directionFacing) + '_' + (this.isEvading() ? 'angry' : 'patrol'));
 };
+EnemyGuard.prototype.directionToString = function (d) {
+  switch (d) {
+    case Directions.EAST:
+      return 'right';
+    case Directions.WEST:
+      return 'left';
+    case Directions.NORTH:
+      return 'up';
+    case Directions.SOUTH:
+      return 'down';
+    default:
+      return 'down';
+  };
+}
 EnemyGuard.prototype.shootBullet = function () {
   var newBullet = this.bulletPool.getFirstDead();
   
