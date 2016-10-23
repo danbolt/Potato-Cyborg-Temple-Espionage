@@ -12,5 +12,7 @@ Load.prototype.preload = function() {
   this.game.load.tilemap('level1', 'asset/map/level1.json', undefined, Phaser.Tilemap.TILED_JSON);
 };
 Load.prototype.create = function() {
+	ResetPlayerProgress();
+
  	this.game.state.start('Gameplay');
 };

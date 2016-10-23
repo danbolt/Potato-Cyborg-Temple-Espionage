@@ -6,3 +6,15 @@ var Directions = {
 
   COUNT : 4,
 };
+
+
+var PlayerProgress = {
+	LipBalmFound: [false, false, false],
+
+	MadeItPastTutorial: false
+}
+
+var ResetPlayerProgress = function () {
+	PlayerProgress.LipBalmFound = [false, false, false];
+	PlayerProgress.MadeItPastTutorial = false;
+}

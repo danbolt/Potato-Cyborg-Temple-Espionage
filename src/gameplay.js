@@ -57,8 +57,6 @@ Gameplay.prototype.create = function() {
   this.player = new Player(this.game, 30 * 16, 144 * 16);
   this.game.add.existing(this.player);
 
-  player = this.player;
-
   this.goalObjectPool = this.game.add.group();
   for (var i = 0; i < 3; i++) {
     var newGoal = new GoalObject(this.game, -1000, -1000);
@@ -90,6 +88,17 @@ Gameplay.prototype.create = function() {
   this.camera.bounds = null;
   this.camera.x = 20 * 16;
   this.camera.y = 135 * 16;
+
+  // HACK
+  player = this.player;
+
+  if (PlayerProgress.MadeItPastTutorial === true) {
+    this.camera.x = 80 * 16;
+    this.camera.y = 90 * 16;
+
+    this.player.x = 88 * 16;
+    this.player.y = 99 * 16;
+  }
 
   this.game.world.bringToTop(this.ui);
 };
@@ -145,6 +154,10 @@ Gameplay.prototype.spawnObjectsForRoom = function () {
         newGoal.revive();
         newGoal.position.set(objectData.x, objectData.y);
         newGoal.frame = 86 + objectData.properties.index;
+        newGoal.index = objectData.properties.index;
+        if (PlayerProgress.LipBalmFound[newGoal.index] ) {
+          newGoal.kill();
+        }
       }
     }
   }, this);
@@ -160,8 +173,9 @@ Gameplay.prototype.update = function () {
   }, undefined, this);
   this.game.physics.arcade.overlap(this.player, this.goalObjectPool, function (player, goal) {
     goal.kill();
+    PlayerProgress.LipBalmFound[goal.index] = true;
 
-    this.game.state.start('WinScreen');
+    //this.game.state.start('WinScreen');
   }, undefined, this);
   this.game.physics.arcade.collide(this.foreground, this.bulletPool, function (bullet, foreground) {
     bullet.kill();
@@ -194,6 +208,10 @@ Gameplay.prototype.update = function () {
 
           this.spawnGuardsForRoom();
           this.spawnObjectsForRoom();
+
+          if (this.player.y < 107 * 16) {
+            PlayerProgress.MadeItPastTutorial = true;
+          }
 
         }, this);
         cameraShuffle.start();
