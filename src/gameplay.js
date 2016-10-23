@@ -195,11 +195,11 @@ Gameplay.prototype.update = function () {
     }
   }
 };
-
+/*
 Gameplay.prototype.render = function () {
   this.guards.forEachAlive(function (guard) {
-    var guardAngleA = guard.directionFacing / Directions.COUNT * Math.PI * 2 + (guard.sightWidth / 2);
-    var guardAngleB = guard.directionFacing / Directions.COUNT * Math.PI * 2 - (guard.sightWidth / 2);
+    var guardAngleA = ((guard.directionFacing / Directions.COUNT * Math.PI * 2 + (guard.sightWidth / 2)) + Math.PI * 2) % (Math.PI * 2);
+    var guardAngleB = ((guard.directionFacing / Directions.COUNT * Math.PI * 2 - (guard.sightWidth / 2)) + Math.PI * 2) % (Math.PI * 2);
     var playerAngle = Math.atan2( this.player.y - guard.position.y, this.player.x - guard.position.x );
 
     this.game.debug.geom(new Phaser.Circle(guard.x, guard.y, guard.sightRange * 2), 'white', false);
@@ -209,6 +209,7 @@ Gameplay.prototype.render = function () {
   }, this);
   
 };
+*/
 Gameplay.prototype.shutdown = function () {
   this.player = null;
   this.guards = [];

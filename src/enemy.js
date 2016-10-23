@@ -50,11 +50,12 @@ EnemyGuard.prototype.update = function () {
   if (this.isEvading() === false) {
     // check if the player is in sight
     if (this.position.distance(this.player.position, true) < this.sightRange) {
-      var guardAngleA = this.directionFacing / Directions.COUNT * Math.PI * 2 + (this.sightWidth / 2);
-      var guardAngleB = this.directionFacing / Directions.COUNT * Math.PI * 2 - (this.sightWidth / 2);
+      var guardAngleA = ((this.directionFacing / Directions.COUNT * Math.PI * 2 + (this.sightWidth / 2)) + Math.PI * 2) % (Math.PI * 2);
+      var guardAngleB = ((this.directionFacing / Directions.COUNT * Math.PI * 2 - (this.sightWidth / 2)) + Math.PI * 2) % (Math.PI * 2);
       var playerAngle = (Math.PI * 2 + Math.atan2( this.player.y - this.position.y, this.player.x - this.position.x )) % (Math.PI * 2);
 
-      if (playerAngle > guardAngleB && playerAngle < guardAngleA) {
+      if ((playerAngle > guardAngleB && playerAngle < guardAngleA) ||
+            (this.directionFacing === Directions.EAST && (playerAngle < (this.sightWidth / 2) || playerAngle > (Math.PI * 2 - (this.sightWidth / 2)))))  {
 
         var rayCastResult = this.foreground.getRayCastTiles(new Phaser.Line(this.x, this.y, this.player.x, this.player.y), 4, true);
 
