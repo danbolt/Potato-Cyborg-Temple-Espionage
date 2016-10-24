@@ -20,7 +20,9 @@ var ResetPlayerProgress = function () {
 }
 
 var Messages = {
-	TestMessage: "hello world, this is not\nsnorlax!!!!!"
+	TestMessage: "hello world, this is not\nsnorlax!!!!!",
+	Message1: "Lisa Blackout, I need new lip\nbalm! My face is parched!\nEnter the Potato Android temple\nand retreive all three for me!\nAre you spy a enough?",
+
 };
 
 var soundEffectsToLoad = ['alarm',

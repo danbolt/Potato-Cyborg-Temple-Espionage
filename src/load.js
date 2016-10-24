@@ -2,6 +2,8 @@ var Load = function () {
 	//
 };
 Load.prototype.preload = function() {
+  this.game.load.image('logo', 'asset/img/logo.png');
+
   this.game.load.spritesheet('test16x16', 'asset/img/16x16SquareSheet.png', 16, 16);
   this.game.load.image('test16x16_tile', 'asset/img/16x16SquareSheet.png');
 
@@ -25,5 +27,5 @@ Load.prototype.create = function() {
     SoundBank[sname] = this.game.add.audio(sname, 0.8, false);
   }, this);
 
- 	this.game.state.start('Gameplay');
+ 	this.game.state.start('TitleScreen');
 };

@@ -166,7 +166,7 @@ EnemyGuard.prototype.shootBullet = function () {
 };
 EnemyGuard.prototype.startShooting = function () {
   if (this.isEvading() && this.guardLoop === null) {
-    this.guardLoop = this.game.time.events.loop(this.fireRate, function () {  this.shootFlag = true; }, this);
+    this.guardLoop = this.game.time.events.loop(this.fireRate, function () { if (this.isEvading) { this.shootFlag = true; } }, this);
   }
 };
 EnemyGuard.prototype.stopShooting = function () {

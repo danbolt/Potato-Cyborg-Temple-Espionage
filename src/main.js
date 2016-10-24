@@ -39,6 +39,7 @@ var main = function () {
 	game.state.add('Load', Load, false);
   game.state.add('WinScreen', WinScreen, false);
   game.state.add('LoseScreen', LoseScreen, false);
+  game.state.add('TitleScreen', TitleScreen, false);
 	game.state.add('Preload', Preload, false);
 
 	game.state.start('Preload');
