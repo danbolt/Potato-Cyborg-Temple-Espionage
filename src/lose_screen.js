@@ -38,6 +38,8 @@ TitleScreen.prototype.create = function() {
 	var spaceKey = this.game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
 	spaceKey.onUp.add(function () {
 		SoundBank['select'].play();
+		
+		ResetPlayerProgress();
 
 		this.game.state.start('Gameplay');
 	}, this);
