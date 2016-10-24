@@ -57,6 +57,19 @@ Gameplay.prototype.create = function() {
 
   this.player = new Player(this.game, 30 * 16, 144 * 16);
   this.game.add.existing(this.player);
+  this.player.events.onKilled.add(function () {
+    for (var i = 0; i < 10; i++) {
+      var newParticle = this.particles.getFirstDead();
+      if (newParticle !== null) {
+        newParticle.revive();
+        newParticle.body.velocity.set(Math.cos(Math.PI * 2 * (i / 10)) * 150, Math.sin(Math.PI * 2 * (i / 10)) * 150);
+        newParticle.x = this.player.x;
+        newParticle.y = this.player.y;
+        newParticle.lifespan = 3000;
+        newParticle.animations.play('player_gib');
+      }
+    }
+  }, this);
 
   this.goalObjectPool = this.game.add.group();
   for (var i = 0; i < 3; i++) {
@@ -92,6 +105,7 @@ Gameplay.prototype.create = function() {
     // create particle animations
     particle.animations.add('shot_flicker', [84, 85], 16, true);
     particle.animations.add('sight', [90, 91], 16, true);
+    particle.animations.add('player_gib', [92, 93], 16, true);
 
     this.particles.addChild(particle);
 
@@ -196,7 +210,9 @@ Gameplay.prototype.update = function () {
     player.kill();
     bullet.kill();
 
-    this.game.state.start('LoseScreen');
+    this.game.time.events.add(2000, function () {
+      this.game.state.start('LoseScreen');
+    }, this);
   }, undefined, this);
   this.game.physics.arcade.overlap(this.player, this.goalObjectPool, function (player, goal) {
     goal.kill();
