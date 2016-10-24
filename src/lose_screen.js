@@ -4,10 +4,19 @@ var LoseScreen = function () {
 LoseScreen.prototype.create = function() {
 	this.game.camera.reset();
 
-	this.game.add.bitmapText(32, 32, 'font', 'you lose sorry :(', 8);
+	var loseText = this.game.add.bitmapText(this.game.width / 2, this.game.height / 2, 'font', 'Lisa! You died!\n\n\nWant to give it another go?\n\n\nPress space to retry.\n\nPress Backspace to return to title.', 8);
+	loseText.align = 'center';
+	loseText.anchor.set(0.5, 0.5);
 
-	this.game.time.events.add(2000, function () {
+
+	this.game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR).onUp.add(function () {
+		SoundBank['select'].play();
 		this.game.state.start('Gameplay');
+	}, this);
+
+	this.game.input.keyboard.addKey(Phaser.KeyCode.BACKSPACE).onUp.add(function () {
+		SoundBank['select'].play();
+		this.game.state.start('TitleScreen');
 	}, this);
 };
 
