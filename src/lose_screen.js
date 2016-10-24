@@ -29,7 +29,7 @@ TitleScreen.prototype.create = function() {
 	var logo = this.game.add.sprite(this.game.width / 2, this.game.height / 4 + 16, 'logo');
 	logo.anchor.set(0.5, 0.5);
 
-	var instructions = this.game.add.bitmapText(this.game.width / 2, this.game.height / 2 + 16, 'font', 'arrow keys to move\n\npress space to start', 8);
+	var instructions = this.game.add.bitmapText(this.game.width / 2, this.game.height / 2 + 32, 'font', 'arrow keys to move\n\npress space to start', 8);
 	instructions.align = 'center';
 	instructions.anchor.x = 0.5;
 
