@@ -60,7 +60,7 @@ EnemyGuard.prototype.update = function () {
         var rayCastResult = this.foreground.getRayCastTiles(new Phaser.Line(this.x, this.y, this.player.x, this.player.y), 4, true);
 
         if (rayCastResult.length < 1) {
-          this.sightedPlayer();
+          this.sightedPlayer(this);
           this.body.velocity.set(0, 0);
         }
       }
@@ -117,6 +117,47 @@ EnemyGuard.prototype.shootBullet = function () {
     newBullet.x = this.x;
     newBullet.y = this.y;
 
+    var newParticle = this.particles.getFirstDead();
+    if (newParticle !== null) {
+      newParticle.revive();
+      newParticle.x = newBullet.x;
+      newParticle.y = newBullet.y;
+
+      newParticle.body.velocity.set(100, 100);
+      newParticle.animations.play('shot_flicker');
+      newParticle.lifespan = 250;
+    }
+    newParticle = this.particles.getFirstDead();
+    if (newParticle !== null) {
+      newParticle.revive();
+      newParticle.x = newBullet.x;
+      newParticle.y = newBullet.y;
+
+      newParticle.body.velocity.set(-100, 100);
+      newParticle.animations.play('shot_flicker');
+      newParticle.lifespan = 250;
+    }
+    newParticle = this.particles.getFirstDead();
+    if (newParticle !== null) {
+      newParticle.revive();
+      newParticle.x = newBullet.x;
+      newParticle.y = newBullet.y;
+
+      newParticle.body.velocity.set(100, -100);
+      newParticle.animations.play('shot_flicker');
+      newParticle.lifespan = 250;
+    }
+    newParticle = this.particles.getFirstDead();
+    if (newParticle !== null) {
+      newParticle.revive();
+      newParticle.x = newBullet.x;
+      newParticle.y = newBullet.y;
+
+      newParticle.body.velocity.set(-100, -100);
+      newParticle.animations.play('shot_flicker');
+      newParticle.lifespan = 250;
+    }
+
     this.directionFacing =  ~~((((shootAngle + (Math.PI * 2)) % (Math.PI * 2) ) / (Math.PI * 2)) * Directions.COUNT);
   }
 };
@@ -128,6 +169,7 @@ EnemyGuard.prototype.startShooting = function () {
 EnemyGuard.prototype.stopShooting = function () {
   if (this.guardLoop !== null) {
     this.game.time.events.remove(this.guardLoop);
+    this.guardLoop = null;
   }
 };
 

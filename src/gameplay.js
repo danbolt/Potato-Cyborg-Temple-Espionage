@@ -12,6 +12,7 @@ var Gameplay = function () {
   this.guards = null;
   this.bulletPool = null;
   this.goalObjectPool = null;
+  this.particles = null;
   this.ui = null;
 
   this.isScrolling = false;
@@ -35,8 +36,8 @@ Gameplay.prototype.create = function() {
   // stealth game logic
   this.evading = false;
   this.isEvading = function () { return that.evading; };
-  this.sightedPlayer = function () {
-    that.playerSighted();
+  this.sightedPlayer = function (guard) {
+    that.playerSighted(guard);
   };
 
   // create map
@@ -82,6 +83,22 @@ Gameplay.prototype.create = function() {
   }
   this.spawnGuardsForRoom();
 
+  this.particles = this.game.add.group();
+  for (var i = 0; i < 50; i++) {
+    var particle = this.game.add.sprite(-2000, -2000, 'sprite_sheet_16x16', 0);
+    this.game.physics.enable(particle, Phaser.Physics.ARCADE);
+    particle.anchor.set(0.5, 0.5);
+
+    // create particle animations
+    particle.animations.add('shot_flicker', [84, 85], 16, true);
+    particle.animations.add('sight', [90, 91], 16, true);
+
+    this.particles.addChild(particle);
+
+    particle.kill();
+  }
+  this.guards.forEach(function (g) { g.particles = this.particles; }, this);
+
   // setup camera scrolling
   this.isScrolling = false;
   this.camera.roundPx = true;
@@ -102,9 +119,19 @@ Gameplay.prototype.create = function() {
 
   this.game.world.bringToTop(this.ui);
 };
-Gameplay.prototype.playerSighted = function () {
+Gameplay.prototype.playerSighted = function (guard) {
   this.evading = true;
   this.ui.sneakLabel.text = 'watch out!';
+
+  var newParticle = this.particles.getFirstDead();
+  if (newParticle !== null) {
+    newParticle.revive();
+    newParticle.body.velocity.set(0, 0);
+    newParticle.x = guard.x + 16;
+    newParticle.y = guard.y - 32;
+    newParticle.lifespan = 1000;
+    newParticle.animations.play('sight');
+  }
 
   this.guards.forEachAlive(function (g) {
     g.body.velocity.set(0, 0);
@@ -239,6 +266,7 @@ Gameplay.prototype.shutdown = function () {
   this.guards = [];
   this.bulletPool = null;
   this.goalObjectPool = null;
+  this.particles = null;
   this.ui = null;
 
   this.map = null;
