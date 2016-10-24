@@ -24,7 +24,7 @@ var ResetPlayerProgress = function () {
 
 var Messages = {
 	TestMessage: "hello world, this is not\nsnorlax!!!!!",
-	Message1: "Lisa Blackout, I need new lip\nbalm! My face is parched!\nEnter the Potato Android temple\nand retreive all three for me!\n\nAre you spy a enough?     ",
+	Message1: "Lisa Blackout, I need new lip\nbalm! My face is parched!\nEnter the Potato Android temple\nand bring them all to the van!\n\nAre you spy a enough?     ",
 	GetBalmMessages: ["Nice one! You got the first!\nTwo more left!!!",
 										"That's two lip balms!\nOnly one more to go!",
 										"You got all three!\nTime to get out of there!\n\nGet back to the van!!!" ],

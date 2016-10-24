@@ -7,6 +7,8 @@ var Player = function (game, x, y) {
 
   this.direction = Directions.SOUTH;
 
+  this.gamepad = this.game.input.gamepad.pad1;
+
   // add animations
   this.animations.add('walk_down', [0, 1], 4, true);
   this.animations.add('walk_up', [2, 3], 4, true);
@@ -44,20 +46,20 @@ Player.prototype.update = function () {
 
   if (this.disableMovement === false) {
     // move the player velocity based on keyboard input
-    if (this.game.input.keyboard.isDown(Phaser.KeyCode.RIGHT)) {
+    if (this.game.input.keyboard.isDown(Phaser.KeyCode.RIGHT) || this.gamepad.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) || this.gamepad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.3) {
       this.body.velocity.x = this.playerWalkSpeed;
       this.direction = Directions.EAST;
-    } else if (this.game.input.keyboard.isDown(Phaser.KeyCode.LEFT)) {
+    } else if (this.game.input.keyboard.isDown(Phaser.KeyCode.LEFT) || this.gamepad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.gamepad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.3) {
       this.body.velocity.x = -this.playerWalkSpeed;
       this.direction = Directions.WEST;
     } else {
       this.body.velocity.x = 0;
     }
 
-    if (this.game.input.keyboard.isDown(Phaser.KeyCode.DOWN)) {
+    if (this.game.input.keyboard.isDown(Phaser.KeyCode.DOWN) || this.gamepad.isDown(Phaser.Gamepad.XBOX360_DPAD_DOWN) || this.gamepad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.3) {
       this.body.velocity.y = this.playerWalkSpeed;
       this.direction = Directions.SOUTH;
-    } else if (this.game.input.keyboard.isDown(Phaser.KeyCode.UP)) {
+    } else if (this.game.input.keyboard.isDown(Phaser.KeyCode.UP) || this.gamepad.isDown(Phaser.Gamepad.XBOX360_DPAD_UP) || this.gamepad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) < -0.3) {
       this.body.velocity.y = -this.playerWalkSpeed;
       this.direction = Directions.NORTH;
     } else {

@@ -33,6 +33,8 @@ Preload.prototype.create = function() {
   instructions.align = 'center';
   instructions.anchor.x = 0.5;
 
+  this.game.input.gamepad.start();
+
  	this.game.state.start('Load', false);
 };
 
