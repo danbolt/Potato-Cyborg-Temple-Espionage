@@ -18,3 +18,7 @@ var ResetPlayerProgress = function () {
 	PlayerProgress.LipBalmFound = [false, false, false];
 	PlayerProgress.MadeItPastTutorial = false;
 }
+
+var Messages = {
+	TestMessage: "hello world, this is not\nsnorlax!!!!!"
+};

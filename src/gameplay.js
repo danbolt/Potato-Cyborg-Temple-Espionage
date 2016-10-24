@@ -63,6 +63,53 @@ Gameplay.prototype.create = function() {
     }
   }, this);
 
+  // cutscene data
+  this.ui.cutscene = this.ui.addChild(this.game.add.group());
+  var cutsceneBacking = this.game.add.sprite(0, 0, 'test16x16', 1);
+  cutsceneBacking.width = this.game.width;
+  cutsceneBacking.height = this.game.height;
+  this.ui.cutscene.addChild(cutsceneBacking);
+  var colonelPortrait = this.game.add.sprite(this.game.width / 6 * 1.25, 128, 'portraits', 0);
+  colonelPortrait.anchor.set(0.5, 1);
+  var lisaPortrait = this.game.add.sprite(this.game.width / 6 * 4.75, 128, 'portraits', 1);
+  lisaPortrait.anchor.set(0.5, 1);
+  this.ui.cutscene.addChild(colonelPortrait);
+  this.ui.cutscene.addChild(lisaPortrait);
+  var radioLabel = this.game.add.bitmapText(this.game.width / 2, 64, 'font', 'radio\n\n109.39hz', 8);
+  radioLabel.align = 'center';
+  radioLabel.anchor.x = 0.5;
+  this.ui.cutscene.add(radioLabel);
+  var messageText = this.game.add.bitmapText(48, 164, 'font', 'the quick brown fox gets lazy\nand snorlax reigns supreme', 8);
+  this.ui.cutscene.add(messageText);
+  this.ui.cutscene.visible = false;
+
+  this.showCutscene = function (dialogue) {
+    if (this.ui.cutscene.visible === true) { return; }
+
+    this.ui.cutscene.visible = true;
+    this.player.disableMovement = true;
+
+    messageText.text = '';
+
+    var counter = 0;
+    var messageLoop = this.game.time.events.loop(100, function () {
+      counter++;
+
+      messageText.text = dialogue.substring(0, counter);
+
+      if (counter === dialogue.length) {
+        this.game.time.events.remove(messageLoop);
+
+        this.game.time.events.add(750, function () {
+          this.ui.cutscene.visible = false;
+          this.player.disableMovement = false;
+        }, this);
+      }
+    }, this);
+  };
+
+  this.game.time.events.add(1000, function () { this.showCutscene(Messages.TestMessage);  }, this);
+
   this.player = new Player(this.game, 30 * 16, 144 * 16);
   this.game.add.existing(this.player);
   this.player.events.onKilled.add(function () {
@@ -246,6 +293,7 @@ Gameplay.prototype.update = function () {
         this.playerSnuckAway();
         this.guards.forEachAlive(function (guard) {
           guard.kill();
+          this.guards.sendToBack(guard);
         }, this);
         this.goalObjectPool.forEachAlive(function (goal) {
           goal.kill();
