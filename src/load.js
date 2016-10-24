@@ -8,6 +8,7 @@ Load.prototype.preload = function() {
   this.game.load.spritesheet('sprite_sheet_16x16', 'asset/img/spriteSheet.png', 16, 16);
   this.game.load.spritesheet('sprite_sheet_16x32', 'asset/img/spriteSheet.png', 16, 32);
   this.game.load.spritesheet('sprite_sheet_32x32', 'asset/img/spriteSheet.png', 32, 32);
+  this.game.load.spritesheet('sprite_sheet_128x16', 'asset/img/spriteSheet.png', 128, 16);
 
   this.game.load.tilemap('level1', 'asset/map/level1.json', undefined, Phaser.Tilemap.TILED_JSON);
 };

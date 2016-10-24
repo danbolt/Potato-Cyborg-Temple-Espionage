@@ -51,9 +51,17 @@ Gameplay.prototype.create = function() {
   this.game.physics.enable(this.foreground, Phaser.Physics.ARCADE);
 
   this.ui = this.game.add.group();
+  this.ui.sneakBacking = this.ui.addChild(this.game.add.sprite(28, 28, 'sprite_sheet_128x16', 12));
   this.ui.sneakLabel = this.ui.addChild(this.game.add.bitmapText(32, 32, 'font', 'test', 8));
   this.ui.fixedToCamera = true;
   this.playerSnuckAway();
+  this.game.time.events.loop(500, function () {
+    if (this.isEvading()) {
+      this.ui.sneakBacking.renderable = !this.ui.sneakBacking.renderable;
+    } else {
+      this.ui.sneakBacking.renderable = true;
+    }
+  }, this);
 
   this.player = new Player(this.game, 30 * 16, 144 * 16);
   this.game.add.existing(this.player);
@@ -136,6 +144,7 @@ Gameplay.prototype.create = function() {
 Gameplay.prototype.playerSighted = function (guard) {
   this.evading = true;
   this.ui.sneakLabel.text = 'watch out!';
+  this.ui.sneakBacking.frame = 13;
 
   var newParticle = this.particles.getFirstDead();
   if (newParticle !== null) {
@@ -155,6 +164,7 @@ Gameplay.prototype.playerSighted = function (guard) {
 Gameplay.prototype.playerSnuckAway = function () {
   this.evading = false;
   this.ui.sneakLabel.text = 'sneaking!';
+  this.ui.sneakBacking.frame = 12;
 };
 Gameplay.prototype.spawnGuardsForRoom = function () {
   // if there is a guard in the bounds of the camera, spawn it in the room
