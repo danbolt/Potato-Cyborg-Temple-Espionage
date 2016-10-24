@@ -28,7 +28,12 @@ Preload.prototype.preload = function() {
   this.game.load.bitmapFont('font', 'asset/font/font.png', 'asset/font/font.json');
 };
 Preload.prototype.create = function() {
- 	this.game.state.start('Load');
+
+  var instructions = this.game.add.bitmapText(this.game.width / 2, this.game.height / 2 , 'font', 'loading...\n\nPlease wait!', 8);
+  instructions.align = 'center';
+  instructions.anchor.x = 0.5;
+
+ 	this.game.state.start('Load', false);
 };
 
 var main = function () {
