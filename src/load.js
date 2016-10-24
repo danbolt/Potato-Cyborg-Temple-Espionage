@@ -14,6 +14,8 @@ Load.prototype.preload = function() {
   this.game.load.spritesheet('sprite_sheet_32x32', 'asset/img/spriteSheet.png', 32, 32);
   this.game.load.spritesheet('sprite_sheet_128x16', 'asset/img/spriteSheet.png', 128, 16);
 
+  this.game.load.audio('background_melody', 'asset/bgm/jealous-villages.mp3');
+
   soundEffectsToLoad.forEach(function (sname) {
     this.game.load.audio(sname, 'asset/sfx/' + sname + '.wav');
   }, this);
@@ -21,7 +23,8 @@ Load.prototype.preload = function() {
   this.game.load.tilemap('level1', 'asset/map/level1.json', undefined, Phaser.Tilemap.TILED_JSON);
 };
 Load.prototype.create = function() {
-	ResetPlayerProgress();
+  this.game.bgmMelody = this.game.add.audio('background_melody', 0.8, true);
+  this.game.bgmMelody.play();
 
 	soundEffectsToLoad.forEach(function (sname) {
     SoundBank[sname] = this.game.add.audio(sname, 0.8, false);
