@@ -292,6 +292,9 @@ Gameplay.prototype.update = function () {
 
         this.playerSnuckAway();
         this.guards.forEachAlive(function (guard) {
+          guard.x = -1000;
+          guard.y = -1000;
+          guard.stopShooting();
           guard.kill();
           this.guards.sendToBack(guard);
         }, this);
