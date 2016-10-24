@@ -41,6 +41,6 @@ TitleScreen.prototype.create = function() {
 
 		ResetPlayerProgress();
 
-		this.game.state.start('Gameplay');
+		this.game.state.start('WinScreen');
 	}, this);
 };

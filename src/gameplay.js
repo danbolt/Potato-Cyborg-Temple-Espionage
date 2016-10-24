@@ -116,7 +116,11 @@ Gameplay.prototype.create = function() {
     }, this);
   };
 
-  this.game.time.events.add(1500, function () { this.showCutscene(Messages.Message1);  }, this);
+  if (PlayerProgress.ShownFirstCutscene === false) {
+    this.game.time.events.add(1500, function () { this.showCutscene(Messages.Message1);  }, this);
+
+    PlayerProgress.ShownFirstCutscene = true;
+  }
 
   this.player = new Player(this.game, 30 * 16, 144 * 16);
   this.game.add.existing(this.player);
