@@ -83,32 +83,40 @@ Gameplay.prototype.create = function() {
   this.ui.cutscene.add(messageText);
   this.ui.cutscene.visible = false;
 
+  this.showingCutscene = false;
   this.showCutscene = function (dialogue) {
-    if (this.ui.cutscene.visible === true) { return; }
+    if (this.showingCutscene === true) { return; }
 
-    this.ui.cutscene.visible = true;
-    this.player.disableMovement = true;
+    this.showingCutscene = true;
+    SoundBank['codec'].play();
+    this.game.time.events.add(500, function () {
+      this.ui.cutscene.visible = true;
+      this.player.disableMovement = true;
 
-    messageText.text = '';
+      messageText.text = '';
 
-    var counter = 0;
-    var messageLoop = this.game.time.events.loop(100, function () {
-      counter++;
+      var counter = 0;
+      var messageLoop = this.game.time.events.loop(100, function () {
+        counter++;
 
-      messageText.text = dialogue.substring(0, counter);
+        messageText.text = dialogue.substring(0, counter);
 
-      if (counter === dialogue.length) {
-        this.game.time.events.remove(messageLoop);
+        SoundBank['bip'].play();
 
-        this.game.time.events.add(750, function () {
-          this.ui.cutscene.visible = false;
-          this.player.disableMovement = false;
-        }, this);
-      }
+        if (counter === dialogue.length) {
+          this.game.time.events.remove(messageLoop);
+
+          this.game.time.events.add(750, function () {
+            this.ui.cutscene.visible = false;
+            this.player.disableMovement = false;
+            this.showingCutscene = false;
+          }, this);
+        }
+      }, this);
     }, this);
   };
 
-  this.game.time.events.add(1000, function () { this.showCutscene(Messages.TestMessage);  }, this);
+  //this.game.time.events.add(1000, function () { this.showCutscene(Messages.TestMessage);  }, this);
 
   this.player = new Player(this.game, 30 * 16, 144 * 16);
   this.game.add.existing(this.player);
@@ -193,6 +201,8 @@ Gameplay.prototype.playerSighted = function (guard) {
   this.ui.sneakLabel.text = 'watch out!';
   this.ui.sneakBacking.frame = 13;
 
+  SoundBank['alarm'].play();
+
   var newParticle = this.particles.getFirstDead();
   if (newParticle !== null) {
     newParticle.revive();
@@ -267,6 +277,8 @@ Gameplay.prototype.update = function () {
     player.kill();
     bullet.kill();
 
+    SoundBank['hurt'].play();
+
     this.game.time.events.add(2000, function () {
       this.game.state.start('LoseScreen');
     }, this);
@@ -313,7 +325,7 @@ Gameplay.prototype.update = function () {
           this.spawnGuardsForRoom();
           this.spawnObjectsForRoom();
 
-          if (this.player.y < 107 * 16) {
+          if (this.player.y < 105 * 16) {
             PlayerProgress.MadeItPastTutorial = true;
           }
 

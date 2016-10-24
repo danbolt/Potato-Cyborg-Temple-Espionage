@@ -22,3 +22,15 @@ var ResetPlayerProgress = function () {
 var Messages = {
 	TestMessage: "hello world, this is not\nsnorlax!!!!!"
 };
+
+var soundEffectsToLoad = ['alarm',
+                          'bip',
+                          'codec',
+                          'exclaim',
+                          'hurt',
+                          'select',
+                          'shoot1',
+                          'shoot2',
+                          'shoot3'];
+
+var SoundBank = {};

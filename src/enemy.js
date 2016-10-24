@@ -106,11 +106,14 @@ EnemyGuard.prototype.directionToString = function (d) {
       return 'down';
   };
 }
+var bulletSounds = ['shoot1', 'shoot2', 'shoot3'];
 EnemyGuard.prototype.shootBullet = function () {
   var newBullet = this.bulletPool.getFirstDead();
   
   if (newBullet !== null) {
     var shootAngle = Math.atan2(this.player.y - this.y, this.player.x - this.x);
+
+    SoundBank[bulletSounds[~~(Math.random() * bulletSounds.length)]].play();  
 
     newBullet.revive();
     newBullet.setDirection(shootAngle);
