@@ -286,6 +286,9 @@ Gameplay.prototype.update = function () {
   this.game.physics.arcade.overlap(this.player, this.goalObjectPool, function (player, goal) {
     goal.kill();
     PlayerProgress.LipBalmFound[goal.index] = true;
+    var foo = PlayerProgress.LipBalmCount;
+    this.game.time.events.add(1500, function () { this.showCutscene(Messages.GetBalmMessages[foo]);  }, this);
+    PlayerProgress.LipBalmCount++;
 
     //this.game.state.start('WinScreen');
   }, undefined, this);
