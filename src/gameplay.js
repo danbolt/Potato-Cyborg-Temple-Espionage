@@ -271,6 +271,16 @@ Gameplay.prototype.spawnObjectsForRoom = function () {
   }, this);
 };
 Gameplay.prototype.update = function () {
+  // endgame requirements check
+  if (this.player.x >= 821 && this.player.y >= 2234) {
+    if (PlayerProgress.LipBalmCount >= 3) {
+      // won got to the van with all the lip balm!
+
+      this.game.state.start('WinScreen');
+    }
+  }
+
+
   this.game.physics.arcade.collide(this.player, this.foreground);
 
   this.game.physics.arcade.overlap(this.player, this.bulletPool, function (player, bullet) {
@@ -289,8 +299,6 @@ Gameplay.prototype.update = function () {
     var foo = PlayerProgress.LipBalmCount;
     this.game.time.events.add(1500, function () { this.showCutscene(Messages.GetBalmMessages[foo]);  }, this);
     PlayerProgress.LipBalmCount++;
-
-    //this.game.state.start('WinScreen');
   }, undefined, this);
   this.game.physics.arcade.collide(this.foreground, this.bulletPool, function (bullet, foreground) {
     bullet.kill();
