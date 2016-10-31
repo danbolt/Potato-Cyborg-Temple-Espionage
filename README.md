@@ -19,4 +19,4 @@ I've hosted it on my itch.io page [here](https://danbolt.itch.io/ptg-espionage),
 1. Run a web server pointing at the repo's root directory. Then, open a web browser and point to that server.
 
 ## I have a question! Something broke!
-Feel free to email Daniel me.
+Feel free to email me.
